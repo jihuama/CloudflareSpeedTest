@@ -156,13 +156,13 @@ func (s DownloadSpeedSet) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
 }
 
-func (s DownloadSpeedSet) Print() {
+func (s DownloadSpeedSet) Print() (err int) {
 	if NoPrintResult() {
-		return
+		return 1
 	}
 	if len(s) <= 0 { // IP数组长度(IP数量) 大于 0 时继续
 		fmt.Println("\n[信息] 完整测速结果 IP 数量为 0，跳过输出结果。")
-		return
+		return 1
 	}
 	dateString := convertToString(s) // 转为多维数组 [][]String
 	if len(dateString) < PrintNum {  // 如果IP数组长度(IP数量) 小于  打印次数，则次数改为IP数量
@@ -184,4 +184,5 @@ func (s DownloadSpeedSet) Print() {
 	if !noOutput() {
 		fmt.Printf("\n完整测速结果已写入 %v 文件，可使用记事本/表格软件查看。\n", Output)
 	}
+	return 0
 }

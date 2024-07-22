@@ -2,6 +2,7 @@ package task
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"io"
 	"net"
@@ -10,7 +11,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/XIU2/CloudflareSpeedTest/utils"
+	"github.com/jihuama/CloudflareSpeedTest/utils"
 
 	"github.com/VividCortex/ewma"
 )
@@ -21,7 +22,7 @@ const (
 	defaultTimeout                 = 10 * time.Second
 	defaultDisableDownload         = false
 	defaultTestNum                 = 10
-	defaultMinSpeed        float64 = 0.0
+	defaultMinSpeed        float64 = 0.1
 )
 
 var (
@@ -86,9 +87,9 @@ func TestDownloadSpeed(ipSet utils.PingDelaySet) (speedSet utils.DownloadSpeedSe
 		}
 	}
 	bar.Done()
-	if len(speedSet) == 0 { // 没有符合速度限制的数据，返回所有测试数据
-		speedSet = utils.DownloadSpeedSet(ipSet)
-	}
+	//if len(speedSet) == 0 { // 没有符合速度限制的数据，返回所有测试数据
+	//	speedSet = utils.DownloadSpeedSet(ipSet)
+	//}
 	// 按速度排序
 	sort.Sort(speedSet)
 	return
@@ -109,8 +110,10 @@ func getDialContext(ip *net.IPAddr) func(ctx context.Context, network, address s
 // return download Speed
 func downloadHandler(ip *net.IPAddr) float64 {
 	client := &http.Client{
-		Transport: &http.Transport{DialContext: getDialContext(ip)},
-		Timeout:   Timeout,
+		Transport: &http.Transport{DialContext: getDialContext(ip), TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		}},
+		Timeout: Timeout,
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			if len(via) > 10 { // 限制最多重定向 10 次
 				return http.ErrUseLastResponse

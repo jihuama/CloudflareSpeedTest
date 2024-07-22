@@ -3,14 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io"
-	"net/http"
 	"os"
 	"runtime"
 	"time"
 
-	"github.com/XIU2/CloudflareSpeedTest/task"
-	"github.com/XIU2/CloudflareSpeedTest/utils"
+	"github.com/jihuama/CloudflareSpeedTest/task"
+	"github.com/jihuama/CloudflareSpeedTest/utils"
 )
 
 var (
@@ -22,7 +20,7 @@ func init() {
 	var help = `
 CloudflareSpeedTest ` + version + `
 测试 Cloudflare CDN 所有 IP 的延迟和速度，获取最快 IP (IPv4+IPv6)！
-https://github.com/XIU2/CloudflareSpeedTest
+https://github.com/jihuama/CloudflareSpeedTest
 
 参数：
     -n 200
@@ -114,13 +112,6 @@ https://github.com/XIU2/CloudflareSpeedTest
 
 	if printVersion {
 		println(version)
-		fmt.Println("检查版本更新中...")
-		checkUpdate()
-		if versionNew != "" {
-			fmt.Printf("*** 发现新版本 [%s]！请前往 [https://github.com/XIU2/CloudflareSpeedTest] 更新！ ***", versionNew)
-		} else {
-			fmt.Println("当前为最新版本 [" + version + "]！")
-		}
 		os.Exit(0)
 	}
 }
@@ -128,19 +119,16 @@ https://github.com/XIU2/CloudflareSpeedTest
 func main() {
 	task.InitRandSeed() // 置随机数种子
 
-	fmt.Printf("# XIU2/CloudflareSpeedTest %s \n\n", version)
+	fmt.Printf("# jihuama/CloudflareSpeedTest %s \n\n", version)
 
 	// 开始延迟测速 + 过滤延迟/丢包
 	pingData := task.NewPing().Run().FilterDelay().FilterLossRate()
 	// 开始下载测速
 	speedData := task.TestDownloadSpeed(pingData)
 	utils.ExportCsv(speedData) // 输出文件
-	speedData.Print()          // 打印结果
-
-	if versionNew != "" {
-		fmt.Printf("\n*** 发现新版本 [%s]！请前往 [https://github.com/XIU2/CloudflareSpeedTest] 更新！ ***\n", versionNew)
-	}
+	err := speedData.Print()   // 打印结果
 	endPrint()
+	os.Exit(err)
 }
 
 func endPrint() {
@@ -150,25 +138,5 @@ func endPrint() {
 	if runtime.GOOS == "windows" { // 如果是 Windows 系统，则需要按下 回车键 或 Ctrl+C 退出（避免通过双击运行时，测速完毕后直接关闭）
 		fmt.Printf("按下 回车键 或 Ctrl+C 退出。")
 		fmt.Scanln()
-	}
-}
-
-// 检查更新
-func checkUpdate() {
-	timeout := 10 * time.Second
-	client := http.Client{Timeout: timeout}
-	res, err := client.Get("https://api.xiu2.xyz/ver/cloudflarespeedtest.txt")
-	if err != nil {
-		return
-	}
-	// 读取资源数据 body: []byte
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		return
-	}
-	// 关闭资源流
-	defer res.Body.Close()
-	if string(body) != version {
-		versionNew = string(body)
 	}
 }
