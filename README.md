@@ -639,12 +639,6 @@ CloudflareST.exe -f 1.txt
 
 ****
 
-## 赞赏支持
-
-![微信赞赏](https://github.com/XIU2/XIU2/blob/master/img/zs-01.png)![支付宝赞赏](https://github.com/XIU2/XIU2/blob/master/img/zs-02.png)
-
-****
-
 ## 衍生项目
 
 - _https://github.com/xianshenglu/cloudflare-ip-tester-app_  
@@ -666,9 +660,6 @@ _**English language version of CloudflareST (Text language differences only) [#6
 ## 感谢项目
 
 - _https://github.com/Spedoske/CloudflareScanner_
-
-> _因为该项目已经很长时间没更新了，而我又产生了很多功能需求，所以我临时学了下 Go 语言就上手了（菜）..._  
-> _本软件基于该项目制作，但**已添加大量功能及修复 BUG**，并根据大家的使用反馈积极添加、优化功能（闲）..._
 
 ****
 
